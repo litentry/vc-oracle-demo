@@ -102,7 +102,7 @@ export default function Home() {
 
                     <Button w="194px" fontSize={18} fontWeight="bold" borderRadius="90px" h={57} bg="#3772FF"
                             colorScheme="green" onClick={issueVc}>
-                        Claim VC
+                        Request VC
                     </Button>
 
                     <Box mt={4} display="flex" gap={16} justifyContent="start" w="100%">

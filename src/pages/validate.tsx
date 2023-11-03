@@ -98,6 +98,12 @@ const ValidateVcPage: React.FC = () => {
                             {validationResult === 'The VC is valid.' && 'Note: Although this Verifiable Credential has passed integrity checks, you must also have sufficient trust in the issuer to rely on the information contained within.'}
                         </Code>
                     </Center>
+                    <br/>
+                    <Center>
+                        <Code>
+                            {validationResult === 'The VC is valid.' && 'Business stats here.'}
+                        </Code>
+                    </Center>
                 </Box>
             </Container>
         </ChakraProvider>
