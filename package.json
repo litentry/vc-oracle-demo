@@ -23,6 +23,7 @@
     "next": "14.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react18-json-view": "^0.2.6",
     "typescript": "5.2.2"
   }
 }

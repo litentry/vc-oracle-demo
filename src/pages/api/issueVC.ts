@@ -12,14 +12,14 @@ type VC = {
     issuer: string,
     issuanceDate: string,
     credentialSubject: {
-        id: string,
-        degree: {
-            type: string,
-            field: string,
-            university: string
-        }
+        id: string
     },
+    assertion: {
+        ethBalance: number,
+        timestamp: number,
+    }
     proof: {
+        type: string,
         proofValue: string,
         proofPurpose: string,
         createdTimestamp: number,
@@ -36,9 +36,9 @@ export default function handler(
     // NOTE: This is a test keypair. DO NOT USE IN PRODUCTION
     const pair = keyring.addFromUri(`nerve bacon quarter name cross jaguar original flower invest action acquire betray`, {name: 'first pair'}, 'ed25519');
 
-    const {studentID, degreeField} = req.body
+    const {credentialSubjectId, ethAddress} = req.body
 
-    if (!studentID || !degreeField) {
+    if (!credentialSubjectId || !ethAddress) {
         return res.status(400).json({error: 'Bad Request: Missing required fields'})
     }
 
@@ -47,16 +47,15 @@ export default function handler(
     // Create the VC payload without the proof
     const payload: Omit<VC, 'proof'> = {
         '@context': 'https://www.w3.org/2018/credentials/v1',
-        type: ['VerifiableCredential', 'UniversityDegreeCredential'],
-        issuer: `did:harvard:${u8aToHex(pair.publicKey)}`,
+        type: ['VerifiableCredential', 'TokenHolderCredential'],
+        issuer: `did:litentryDemoApp:${u8aToHex(pair.publicKey)}`,
         issuanceDate: new Date().toISOString(),
         credentialSubject: {
-            id: `did:studentPubKey:${studentID}`,
-            degree: {
-                type: 'PhD',
-                field: degreeField,
-                university: 'Harvard University'
-            }
+            id: `did:eth:${ethAddress}`,
+        },
+        assertion:{
+            ethBalance: 100,
+            timestamp: Date.now(),
         }
     }
 
@@ -66,7 +65,8 @@ export default function handler(
 
     const vc: VC = {
         ...payload,
-        proof: {
+        proof:{
+            type: 'Ed25519Signature2018',
             createdTimestamp: Date.now(),
             proofValue: signature,
             proofPurpose: 'assertionMethod',

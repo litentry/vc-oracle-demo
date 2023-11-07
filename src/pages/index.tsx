@@ -14,13 +14,16 @@ import {Keyring} from '@polkadot/keyring';
 import {u8aToHex} from "@polkadot/util";
 import NextLink from 'next/link'
 import {Link} from '@chakra-ui/react'
+import 'react18-json-view/src/style.css'
+import dynamic from "next/dynamic";
+const ReactJson = dynamic(() => import('react18-json-view'), { ssr: false });
 
 const keyring = new Keyring({type: 'sr25519', ss58Format: 2});
 const pair = keyring.addFromUri(`isolate bamboo tennis vivid chicken razor onion process relax fever town board`, {name: 'test pair'}, 'ed25519');
 
 export default function Home() {
     const [publicKey, setPublicKey] = useState<string>(u8aToHex(pair.publicKey));
-    const [degreeField, setDegreeField] = useState<string>('Computer Science');
+    const [ethAddress, setEthAddress] = useState<string>('0x079E275E78783FD1864401ca0F933b3414c65243');
     const [vcResult, setVcResult] = useState<any>(null);
 
     const issueVc = async () => {
@@ -31,8 +34,8 @@ export default function Home() {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    studentID: publicKey,
-                    degreeField,
+                    credentialSubjectId: publicKey,
+                    ethAddress,
                 }),
             });
 
@@ -59,12 +62,12 @@ export default function Home() {
                 <Center>
                     <Logo/>
                 </Center>
-                <Heading mb={12} fontSize={32} fontWeight={600} textAlign="center" color="#E6E7F0">A demo VC issuer that
-                    proves you have a PhD in Computer Seience</Heading>
+                <Heading mb={12} fontSize={32} fontWeight={600} textAlign="center" color="#E6E7F0">A demo VC issuer app that
+                    proves you hold some ETHs without address revealed</Heading>
                 <Center p={5} gap={16} color="#ffffff" flexWrap="wrap" maxWidth={800} marginX="auto">
                     <FormControl id="public-key" mb={4} display="flex" gap={16} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">Public Key:</FormLabel>
+                        <FormLabel whiteSpace="nowrap">Personal pubKey:</FormLabel>
                         <Input
                             w="100%"
                             type="text"
@@ -83,11 +86,11 @@ export default function Home() {
 
                     <FormControl id="degree-field" mb={4} display="flex" gap={16} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">Degree Field:</FormLabel>
+                        <FormLabel whiteSpace="nowrap">ETH address:</FormLabel>
                         <Input
                             w="100%"
                             type="text"
-                            value={degreeField}
+                            value={ethAddress}
                             borderColor="#18191D"
                             bg="#2A2D36"
                             size="md"
@@ -96,7 +99,7 @@ export default function Home() {
                             fontWeight={500}
                             color="#E6E7F0"
                             placeholder="Input a degree field here. e.g. Computer Science"
-                            onChange={(e) => setDegreeField(e.target.value)}
+                            onChange={(e) => setEthAddress(e.target.value)}
                         />
                     </FormControl>
 
@@ -107,13 +110,7 @@ export default function Home() {
 
                     <Box mt={4} display="flex" gap={16} justifyContent="start" w="100%">
                         <FormLabel whiteSpace="nowrap">VC Result:</FormLabel>
-                        <Code
-                            w="100%"
-                            bg="#2A2D36"
-                            color="#E6E7F0"
-                        >
-                            {vcResult && JSON.stringify(vcResult, null, 2)}
-                        </Code>
+                        <ReactJson src={(vcResult)}/>
                     </Box>
                 </Center>
                 <Center>
