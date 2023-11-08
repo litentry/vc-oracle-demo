@@ -1,14 +1,142 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Box, Button, FormControl, FormLabel, Textarea, Code, Center, ChakraProvider} from '@chakra-ui/react';
 import {Container, Heading} from "@chakra-ui/layout";
 import Logo from "@/components/logo";
 import {hexToU8a} from "@polkadot/util";
 import {signatureVerify} from "@polkadot/util-crypto";
 import Head from "next/head";
+import {ethers} from "ethers";
+
+const contractAddress = '0x37a0eF0ac4A2C7d23D491aC1313c3D508a8D8EBB';
+const contractABI = [
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "name": "VC",
+        "outputs": [
+            {
+                "internalType": "bytes",
+                "name": "",
+                "type": "bytes"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "_properties",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            }
+        ],
+        "name": "getVC",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32[]",
+                "name": "_propertyList",
+                "type": "bytes32[]"
+            }
+        ],
+        "name": "setProperties",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "property",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "bytes",
+                "name": "content",
+                "type": "bytes"
+            }
+        ],
+        "name": "setVCProperty",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bytes32",
+                "name": "property",
+                "type": "bytes32"
+            },
+            {
+                "internalType": "string",
+                "name": "content",
+                "type": "string"
+            }
+        ],
+        "name": "setVCPropertyString",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]
 
 const ValidateVcPage: React.FC = () => {
     const [vcInput, setVcInput] = useState<string>('');
     const [validationResult, setValidationResult] = useState<string | null>(null);
+    const [onChainValidationResult, setOnChainValidationResult] = useState<boolean | null>(null);
+    const [onChainData, setOnChainData] = useState<string | null>(null);
 
     const verifyVc = (vcJson: string) => {
         try {
@@ -35,8 +163,21 @@ const ValidateVcPage: React.FC = () => {
         } catch (e) {
             console.error(e);
             return false
+        } finally {
+            verifyVcOnChain(vcJson)
         }
     };
+
+    const verifyVcOnChain = async (vcJson: string) => {
+        const vc = JSON.parse(vcJson);
+        const provider = new ethers.BrowserProvider(window.ethereum)
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const data = await contract.getVC(vc.id);
+        setOnChainData(data);
+        setOnChainValidationResult(data.includes(vc.proof.proofValue))
+    }
 
     const handleValidation = () => {
         try {
@@ -95,7 +236,7 @@ const ValidateVcPage: React.FC = () => {
                     <br/>
                     <Center>
                         <Code>
-                            {validationResult === 'The VC is valid.' && 'Note: Although this Verifiable Credential has passed integrity checks, you must also have sufficient trust in the issuer to rely on the information contained within.'}
+                            {validationResult === 'The VC is valid.' && onChainValidationResult && `The VC is valid on chain. OnChain data: ${onChainData}`}
                         </Code>
                     </Center>
                     <br/>
