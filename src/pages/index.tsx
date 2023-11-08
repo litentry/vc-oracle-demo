@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import {Center, Container, Heading} from "@chakra-ui/layout";
+import {Center, Container, Heading, Text} from "@chakra-ui/layout";
 import Logo from "@/components/logo";
 import {
     Box,
@@ -16,6 +16,7 @@ import NextLink from 'next/link'
 import {Link} from '@chakra-ui/react'
 import 'react18-json-view/src/style.css'
 import dynamic from "next/dynamic";
+import {ethers} from "ethers";
 
 const ReactJson = dynamic(() => import('react18-json-view'), {ssr: false});
 
@@ -24,11 +25,15 @@ const pair = keyring.addFromUri(`isolate bamboo tennis vivid chicken razor onion
 
 export default function Home() {
     const [publicKey, setPublicKey] = useState<string>(u8aToHex(pair.publicKey));
-    const [ethAddress, setEthAddress] = useState<string>('0x079E275E78783FD1864401ca0F933b3414c65243');
+    const [ethAddress, setEthAddress] = useState<string>('');
+    const [threshold, setThreshold] = useState<number>(0.1);
     const [vcResult, setVcResult] = useState<any>(null);
 
     const issueVc = async () => {
         try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const signer = await provider.getSigner(ethAddress);
+            const signature = await signer.signMessage(publicKey);
             const response = await fetch('/api/issueVC', {
                 method: 'POST',
                 headers: {
@@ -37,6 +42,8 @@ export default function Home() {
                 body: JSON.stringify({
                     credentialSubjectId: publicKey,
                     ethAddress,
+                    signature,
+                    threshold,
                 }),
             });
 
@@ -45,6 +52,21 @@ export default function Home() {
         } catch (error) {
             console.error('There was an error issuing the VC:', error);
             setVcResult({error: 'There was an error issuing the VC'});
+        }
+    };
+
+    const connectWallet = async () => {
+        if (window.ethereum) {
+            try {
+                const provider = new ethers.BrowserProvider(window.ethereum);
+                const accounts = await provider.send("eth_requestAccounts", []);
+                const account = accounts[0];
+                setEthAddress(account);
+            } catch (error) {
+                console.error(error);
+            }
+        } else {
+            alert('Please install MetaMask!');
         }
     };
 
@@ -60,9 +82,11 @@ export default function Home() {
             <Container maxWidth={{base: "100%"}} my={10} p={{base: 4, sm: 10}} height="100vh"
                        marginY={0}
                        marginX={{base: 0}}
-                       bg="#18191D">
+                       bg="#18191D"
+                       overflow="scroll">
                 <Center>
                     <Logo/>
+                    <Text color="white">Demo app for Hackerthon</Text>
                 </Center>
                 <Heading mb={12} fontSize={32} fontWeight={600} textAlign="center" color="#E6E7F0">A demo VC issuer app
                     that
@@ -91,6 +115,7 @@ export default function Home() {
                                  alignItems="center" w="100%">
                         <FormLabel whiteSpace="nowrap">ETH address:</FormLabel>
                         <Input
+                            onClick={connectWallet}
                             w="100%"
                             type="text"
                             value={ethAddress}
@@ -101,8 +126,27 @@ export default function Home() {
                             fontSize={14}
                             fontWeight={500}
                             color="#E6E7F0"
-                            placeholder="Input a degree field here. e.g. Computer Science"
+                            placeholder="address that really holds ETHs"
                             onChange={(e) => setEthAddress(e.target.value)}
+                        />
+                    </FormControl>
+
+                    <FormControl id="degree-field" mb={4} display="flex" gap={16} justifyContent="start"
+                                 alignItems="center" w="100%">
+                        <FormLabel whiteSpace="nowrap">Threshold(ETH):</FormLabel>
+                        <Input
+                            w="100%"
+                            type="number"
+                            value={threshold}
+                            borderColor="#18191D"
+                            bg="#2A2D36"
+                            size="md"
+                            borderRadius="12px"
+                            fontSize={14}
+                            fontWeight={500}
+                            color="#E6E7F0"
+                            placeholder="Input a degree field here. e.g. Computer Science"
+                            onChange={(e) => setThreshold(parseInt(e.target.value) ?? 0)}
                         />
                     </FormControl>
 
