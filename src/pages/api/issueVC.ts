@@ -29,7 +29,6 @@ type VC = {
     }
 }
 
-const contractAddress = '0x37a0eF0ac4A2C7d23D491aC1313c3D508a8D8EBB';
 const contractABI = [
     {
         "inputs": [
@@ -161,15 +160,20 @@ export default async function handler(
     if (req.method !== 'POST') {
         return res.status(405).json({error: 'Method Not Allowed'})
     }
-    const nodeUrl = 'http://127.0.0.1:7545';
+    const nodeUrl = 'http://127.0.0.1:8545';
 
-    const privateKey = '0x37c86206249e92b0a04171f772e415a56a054a0c89a23c3a66cb2817ebbd45a6';
+    // Update the following vars in case a new network is launched from scratch:
+    // - contractAddress
+    // - privateKey, which is used to interact with the contract. It needs to have some balance
+    const contractAddress = '0xD3E32B48F5d463997B402ECEDec4AE958207e9dF';
+    const privateKey = '0xc50f3d80fa49d6d5bbf880b01303767ff53bb47140df786d625e57d2e3a79b76';
+
     const provider = new ethers.JsonRpcProvider(nodeUrl);
     const wallet = new ethers.Wallet(privateKey).connect(provider);
     const contract = new ethers.Contract(contractAddress, contractABI, wallet);
 
-    // NOTE: This is a test keypair. DO NOT USE IN PRODUCTION
-    const pair = keyring.addFromUri(`nerve bacon quarter name cross jaguar original flower invest action acquire betray`, {name: 'first pair'}, 'ed25519');
+    // the key pair of the VC issuer
+    const pair = keyring.addFromUri(`spend mistake potato obey lounge shop region guilt tobacco uphold clump throw`, {name: 'first pair'}, 'ed25519');
 
     const {credentialSubjectId, ethAddress, threshold, signature} = req.body
 
@@ -193,7 +197,7 @@ export default async function handler(
         id,
         issuanceDate: new Date().toISOString(),
         credentialSubject: {
-            id: `did:${credentialSubjectId}`,
+            id: `did:litentryDemoApp:${credentialSubjectId}`,
         },
         assertion: {
             ethBalanceThreshold: threshold,
@@ -204,7 +208,6 @@ export default async function handler(
     }
 
     const signatureU8a = pair.sign(JSON.stringify(payload));
-    // console.log(JSON.stringify(payload))
     const proofValue = u8aToHex(signatureU8a)
     const tx = await contract.setVCProperty(id, ethers.encodeBytes32String("signature"), ethers.toUtf8Bytes(proofValue));
 

@@ -10,6 +10,9 @@ Before starting the development server, please follow these steps:
 
 Install and run [Ganache](https://www.trufflesuite.com/ganache) to set up a local Ethereum blockchain for development. This will allow you to deploy smart contracts, develop applications, and run tests.
 
+Default rpc port: 8545
+Default chain ID: 31337
+
 ### 2. Deploy Smart Contracts with Hardhat
 
 Deploy the smart contracts located in the `contracts` directory. Make sure you have [Hardhat](https://hardhat.org/) installed and set up in your project.
@@ -35,8 +38,10 @@ main().catch((error) => {
     npx hardhat run scripts/deploy.js --network localhost
   ```
 
-### 3. Configure Private Key
-Update the `src/pages/api/issueVC.ts` file with your private key obtained from Ganache. Replace the existing private key placeholder with your own to interact with the blockchain.
+### 3. Configure Private Key and Contract Address
+Update the `src/pages/api/issueVC.ts` file with:
+- contract address
+- private key which is used to interact with the contract
 
 ### 4. Start the Development Server
 ```bash
@@ -48,3 +53,13 @@ Open http://localhost:3000 with your browser to see the result.
 You can start editing the page by modifying pages/index.tsx. The page auto-updates as you edit the file.
 
 API routes can be accessed on http://localhost:3000/api/issueVC. This endpoint can be edited in pages/api/issueVC.ts.
+
+
+Explanation of roles in the app:
+- VC owner: the identity that holds the VC / whom the VC is issued to
+- Attesting ETH address: the identity whose information is attested and proven as VC
+- VC issuer: the identity that issued a VC, hardcoded in the app
+
+Please note the identity aggregation process, that is, the proving process of VC owner actually owning the attesting ETH address is intentionally omitted as it's out of this demo's scope. We'd like to focus on the VC use case and integration.
+
+Please refer to https://github.com/litentry/litentry-parachain for more information if interested.
