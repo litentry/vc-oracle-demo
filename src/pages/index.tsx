@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import {Center, Code, Container, Heading} from "@chakra-ui/layout";
+import {Center, Container, Heading} from "@chakra-ui/layout";
 import Logo from "@/components/logo";
 import {
     Box,
@@ -9,12 +9,11 @@ import {
     FormLabel,
     Input,
 } from '@chakra-ui/react';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Keyring} from '@polkadot/keyring';
 import {u8aToHex} from "@polkadot/util";
 import NextLink from 'next/link'
 import {Link} from '@chakra-ui/react'
-import {ethers} from "ethers";
 import 'react18-json-view/src/style.css'
 import dynamic from "next/dynamic";
 
@@ -22,131 +21,6 @@ const ReactJson = dynamic(() => import('react18-json-view'), {ssr: false});
 
 const keyring = new Keyring({type: 'sr25519', ss58Format: 2});
 const pair = keyring.addFromUri(`isolate bamboo tennis vivid chicken razor onion process relax fever town board`, {name: 'test pair'}, 'ed25519');
-
-const contractAddress = '0x37a0eF0ac4A2C7d23D491aC1313c3D508a8D8EBB';
-const contractABI = [
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "name": "VC",
-        "outputs": [
-            {
-                "internalType": "bytes",
-                "name": "",
-                "type": "bytes"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "name": "_properties",
-        "outputs": [
-            {
-                "internalType": "bytes32",
-                "name": "",
-                "type": "bytes32"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-            }
-        ],
-        "name": "getVC",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bytes32[]",
-                "name": "_propertyList",
-                "type": "bytes32[]"
-            }
-        ],
-        "name": "setProperties",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "property",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "bytes",
-                "name": "content",
-                "type": "bytes"
-            }
-        ],
-        "name": "setVCProperty",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "id",
-                "type": "uint256"
-            },
-            {
-                "internalType": "bytes32",
-                "name": "property",
-                "type": "bytes32"
-            },
-            {
-                "internalType": "string",
-                "name": "content",
-                "type": "string"
-            }
-        ],
-        "name": "setVCPropertyString",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    }
-]
 
 export default function Home() {
     const [publicKey, setPublicKey] = useState<string>(u8aToHex(pair.publicKey));
@@ -173,20 +47,6 @@ export default function Home() {
             setVcResult({error: 'There was an error issuing the VC'});
         }
     };
-
-
-    useEffect(() => {
-        (async function () {
-            const provider = new ethers.BrowserProvider(window.ethereum)
-            await provider.send("eth_requestAccounts", []);
-            const signer = await provider.getSigner();
-            const contract = new ethers.Contract(contractAddress, contractABI, signer);
-            // const tx = await contract.setVCProperty(1, ethers.encodeBytes32String("test"), ethers.toUtf8Bytes("test"));
-            // await tx.wait();
-            const data = await contract.getVC(1);
-            console.log(data)
-        })()
-    }, []);
 
 
     return (
@@ -251,18 +111,21 @@ export default function Home() {
                         Request VC
                     </Button>
 
+                    <Center>
+                        {
+                            vcResult && <Link as={NextLink} href='/validate' textDecoration="underline" color="#E6E7F0">
+                                How does somebody else validates this?
+                            </Link>
+                        }
+                    </Center>
+
                     <Box mt={4} display="flex" gap={16} justifyContent="start" w="100%">
+
                         <FormLabel whiteSpace="nowrap">VC Result:</FormLabel>
                         <ReactJson src={(vcResult)}/>
                     </Box>
                 </Center>
-                <Center>
-                    {
-                        vcResult && <Link as={NextLink} href='/validate' textDecoration="underline" color="#E6E7F0">
-                            How does somebody else validates this?
-                        </Link>
-                    }
-                </Center>
+
             </Container>
         </ChakraProvider>
     )

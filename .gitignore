@@ -28,6 +28,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
+src/couter.txt
 
 # vercel
 .vercel
