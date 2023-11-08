@@ -3,7 +3,6 @@ import {Keyring} from '@polkadot/keyring';
 import {u8aToHex} from '@polkadot/util';
 import {promises as fs} from 'fs';
 import {ethers} from "ethers";
-import {Eip1193Provider} from "ethers/lib.esm/providers/provider-browser";
 
 const keyring = new Keyring({type: 'sr25519', ss58Format: 2});
 
@@ -17,7 +16,9 @@ type VC = {
         id: string
     },
     assertion: {
-        ethBalance: number,
+        ethBalanceThreshold: number,
+        op: string,
+        dst: boolean,
         timestamp: number,
     }
     proof: {
@@ -170,15 +171,19 @@ export default async function handler(
     // NOTE: This is a test keypair. DO NOT USE IN PRODUCTION
     const pair = keyring.addFromUri(`nerve bacon quarter name cross jaguar original flower invest action acquire betray`, {name: 'first pair'}, 'ed25519');
 
-    const {credentialSubjectId, ethAddress} = req.body
+    const {credentialSubjectId, ethAddress, threshold, signature} = req.body
 
     if (!credentialSubjectId || !ethAddress) {
         return res.status(400).json({error: 'Bad Request: Missing required fields'})
     }
 
-    const id = await getNextUniqueId();
+    const signatureVerified = ethers.verifyMessage(credentialSubjectId, signature);
 
-    // TODO: ask user sign for the ethAddress, to prove that he owns the address
+    if (!signatureVerified) {
+        return res.status(400).json({error: 'Bad Request: Signature verification failed'})
+    }
+
+    const id = await getNextUniqueId();
 
     // Create the VC payload without the proof
     const payload: Omit<VC, 'proof'> = {
@@ -191,23 +196,24 @@ export default async function handler(
             id: `did:${credentialSubjectId}`,
         },
         assertion: {
-            ethBalance: 100,
+            ethBalanceThreshold: threshold,
+            op: '>',
+            dst: true,
             timestamp: Date.now(),
         }
     }
 
     const signatureU8a = pair.sign(JSON.stringify(payload));
     // console.log(JSON.stringify(payload))
-    const signature = u8aToHex(signatureU8a)
-    const tx = await contract.setVCProperty(id, ethers.encodeBytes32String("signature"), ethers.toUtf8Bytes(signature));
-    // await tx.wait();
+    const proofValue = u8aToHex(signatureU8a)
+    const tx = await contract.setVCProperty(id, ethers.encodeBytes32String("signature"), ethers.toUtf8Bytes(proofValue));
 
     const vc: VC = {
         ...payload,
         proof: {
             type: 'Ed25519Signature2018',
             createdTimestamp: Date.now(),
-            proofValue: signature,
+            proofValue,
             proofPurpose: 'assertionMethod',
         }
     }
