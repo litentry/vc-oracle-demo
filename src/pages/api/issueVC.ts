@@ -165,12 +165,11 @@ export default async function handler(
     // Update the following vars in case a new network is launched from scratch:
     // - contractAddress
     // - privateKey, which is used to interact with the contract. It needs to have some balance
-    const contractAddress = '0x3Ef30810DAD4D3AE85048d56bA5D9D2b6E6f4A02';
-    const privateKey = '0xea8e8b7bcf1ffeffb47fddfaaea5ed629b389c1d22c135625ec84cee94950a74';
+    const privateKey = process.env.NEXT_PUBLIC_ETHEREUM_PRIVATE_KEY;
 
     const provider = new ethers.JsonRpcProvider(nodeUrl);
-    const wallet = new ethers.Wallet(privateKey).connect(provider);
-    const contract = new ethers.Contract(contractAddress, contractABI, wallet);
+    const wallet = new ethers.Wallet(privateKey as string).connect(provider);
+    const contract = new ethers.Contract(process.env.NEXT_PUBLIC_ETHEREUM_CONTRACT_ADDRESS as string, contractABI, wallet);
 
     // the key pair of the VC issuer
     const pair = keyring.addFromUri(`spend mistake potato obey lounge shop region guilt tobacco uphold clump throw`, {name: 'first pair'}, 'ed25519');

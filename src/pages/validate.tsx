@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Box, Button, FormControl, FormLabel, Textarea, Code, Center, ChakraProvider} from '@chakra-ui/react';
 import {Container, Heading} from "@chakra-ui/layout";
 import Logo from "@/components/logo";
@@ -7,8 +7,6 @@ import {signatureVerify} from "@polkadot/util-crypto";
 import Head from "next/head";
 import {ethers} from "ethers";
 
-// Update `contractAddress` in case a new network is launched from scratch:
-const contractAddress = '0x3Ef30810DAD4D3AE85048d56bA5D9D2b6E6f4A02';
 const contractABI = [
     {
         "inputs": [
@@ -171,10 +169,11 @@ const ValidateVcPage: React.FC = () => {
 
     const verifyVcOnChain = async (vcJson: string) => {
         const vc = JSON.parse(vcJson);
-        const provider = new ethers.BrowserProvider(window.ethereum)
-        await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const contract = new ethers.Contract(contractAddress, contractABI, signer);
+        const nodeUrl = process.env.NEXT_PUBLIC_ETHEREUM_JSON_RPC;
+        const provider = new ethers.JsonRpcProvider(nodeUrl);
+        const privateKey = process.env.NEXT_PUBLIC_ETHEREUM_PRIVATE_KEY;
+        const wallet = new ethers.Wallet(privateKey as string).connect(provider);
+        const contract = new ethers.Contract(process.env.NEXT_PUBLIC_ETHEREUM_CONTRACT_ADDRESS as string, contractABI, wallet);
         const data = await contract.getVC(vc.id);
         setOnChainData(data);
         setOnChainValidationResult(data.includes(vc.proof.proofValue))
