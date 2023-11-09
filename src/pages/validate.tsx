@@ -22,7 +22,7 @@ const contractABI = [
                 "type": "bytes32"
             }
         ],
-        "name": "VC",
+        "name": "VCRegistry",
         "outputs": [
             {
                 "internalType": "bytes",

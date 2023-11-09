@@ -88,12 +88,12 @@ export default function Home() {
                     <Logo/>
                 </Center>
                 <Heading mb={12} fontSize={32} fontWeight={600} textAlign="center" color="#E6E7F0">A VC demo app that generates a sample VC</Heading>
-                <Center p={5} gap={16} color="#ffffff" flexWrap="wrap" maxWidth={800} marginX="auto">
-                    <FormControl id="public-key" mb={4} display="flex" gap={16} justifyContent="start"
+                <Center p={5} gap={4} color="#ffffff" flexWrap="wrap" maxWidth={800} marginX="auto">
+                    <FormControl id="public-key" mb={4} display="flex" gap={4} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">VC owner:</FormLabel>
+                        <FormLabel w={180} whiteSpace="nowrap">VC owner:</FormLabel>
                         <Input
-                            w="100%"
+                            flex="1"
                             type="text"
                             value={publicKey}
                             borderColor="#18191D"
@@ -108,12 +108,12 @@ export default function Home() {
                         />
                     </FormControl>
 
-                    <FormControl id="degree-field" mb={4} display="flex" gap={16} justifyContent="start"
+                    <FormControl id="degree-field" mb={4} display="flex" gap={4} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">Attesting ETH address:</FormLabel>
+                        <FormLabel w={180} whiteSpace="nowrap">Attesting ETH address:</FormLabel>
                         <Input
+                            flex="1"
                             onClick={connectWallet}
-                            w="100%"
                             type="text"
                             value={ethAddress}
                             borderColor="#18191D"
@@ -128,11 +128,11 @@ export default function Home() {
                         />
                     </FormControl>
 
-                    <FormControl id="degree-field" mb={4} display="flex" gap={16} justifyContent="start"
+                    <FormControl id="degree-field" mb={4} display="flex" gap={4} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">Threshold(ETH):</FormLabel>
+                        <FormLabel w={180} whiteSpace="nowrap">Threshold(ETH):</FormLabel>
                         <Input
-                            w="100%"
+                            flex="1"
                             type="number"
                             value={threshold}
                             borderColor="#18191D"
