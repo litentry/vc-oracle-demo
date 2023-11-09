@@ -187,6 +187,10 @@ export default async function handler(
         return res.status(400).json({error: 'Bad Request: Signature verification failed'})
     }
 
+    const balance = await provider.getBalance(ethAddress)
+
+    const dst = parseFloat(ethers.formatEther(balance)) > threshold;
+
     const id = await getNextUniqueId();
 
     // Create the VC payload without the proof
@@ -202,14 +206,15 @@ export default async function handler(
         assertion: {
             ethBalanceThreshold: threshold,
             op: '>',
-            dst: true,
+            dst,
             timestamp: Date.now(),
         }
     }
 
     const signatureU8a = pair.sign(JSON.stringify(payload));
     const proofValue = u8aToHex(signatureU8a)
-    await contract.setProperties(["signature"].map(ethers.encodeBytes32String))
+    const txSetProperties = await contract.setProperties(["signature"].map(ethers.encodeBytes32String))
+    await txSetProperties.wait();
     const tx = await contract.setVCProperty(id, ethers.encodeBytes32String("signature"), ethers.toUtf8Bytes(proofValue));
     await tx.wait();
 
