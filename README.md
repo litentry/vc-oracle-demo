@@ -43,7 +43,12 @@ Update the `src/pages/api/issueVC.ts` file with:
 - contract address
 - private key which is used to interact with the contract
 
-### 4. Start the Development Server
+Update the `src/pages/validate.tsx` file with:
+- contract address
+
+### 4. Make sure you metamask account connects to the local testnet
+
+### 5. Start the Development Server
 ```bash
 npm run dev
 ```

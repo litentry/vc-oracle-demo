@@ -7,6 +7,7 @@ import {signatureVerify} from "@polkadot/util-crypto";
 import Head from "next/head";
 import {ethers} from "ethers";
 
+// Update `contractAddress` in case a new network is launched from scratch:
 const contractAddress = '0x3Ef30810DAD4D3AE85048d56bA5D9D2b6E6f4A02';
 const contractABI = [
     {
