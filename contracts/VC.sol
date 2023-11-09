@@ -2,13 +2,13 @@
 pragma solidity ^0.8.0;
 contract VC {
     // uint256 VC id => VC property => content
-    mapping(uint256 => mapping (bytes32 => bytes)) public VC;
+    mapping(uint256 => mapping (bytes32 => bytes)) public VCRegistry;
     bytes32[] public _properties;
     function setVCProperty(uint256 id, bytes32 property, bytes memory content) public {
-        VC[id][property] = content;
+        VCRegistry[id][property] = content;
     }
      function setVCPropertyString(uint256 id, bytes32 property, string memory content) public {
-        VC[id][property] = abi.encodePacked(content);
+        VCRegistry[id][property] = abi.encodePacked(content);
     }
 
     // Please notice remove/alter property list items will not change the existing property storage
@@ -18,7 +18,7 @@ contract VC {
     function getVC(uint256 id) public view returns (string memory) {
         bytes memory temp = abi.encodePacked("{");
         for (uint256 i = 0; i < _properties.length; ++i) {
-            temp = abi.encodePacked(temp, _properties[i], ":", VC[id][_properties[i]], ",");
+            temp = abi.encodePacked(temp, _properties[i], ":", VCRegistry[id][_properties[i]], ",");
         }
         temp = abi.encodePacked(temp, "}");
         return string(temp);

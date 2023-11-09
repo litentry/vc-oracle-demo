@@ -86,15 +86,12 @@ export default function Home() {
                        overflow="scroll">
                 <Center>
                     <Logo/>
-                    <Text color="white">Demo app for Hackerthon</Text>
                 </Center>
-                <Heading mb={12} fontSize={32} fontWeight={600} textAlign="center" color="#E6E7F0">A demo VC issuer app
-                    that
-                    proves you hold some ETHs without address revealed</Heading>
+                <Heading mb={12} fontSize={32} fontWeight={600} textAlign="center" color="#E6E7F0">A VC demo app that generates a sample VC</Heading>
                 <Center p={5} gap={16} color="#ffffff" flexWrap="wrap" maxWidth={800} marginX="auto">
                     <FormControl id="public-key" mb={4} display="flex" gap={16} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">Personal pubKey:</FormLabel>
+                        <FormLabel whiteSpace="nowrap">VC owner:</FormLabel>
                         <Input
                             w="100%"
                             type="text"
@@ -113,7 +110,7 @@ export default function Home() {
 
                     <FormControl id="degree-field" mb={4} display="flex" gap={16} justifyContent="start"
                                  alignItems="center" w="100%">
-                        <FormLabel whiteSpace="nowrap">ETH address:</FormLabel>
+                        <FormLabel whiteSpace="nowrap">Attesting ETH address:</FormLabel>
                         <Input
                             onClick={connectWallet}
                             w="100%"
