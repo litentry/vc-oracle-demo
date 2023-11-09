@@ -171,7 +171,7 @@ const ValidateVcPage: React.FC = () => {
         const vc = JSON.parse(vcJson);
         const nodeUrl = process.env.NEXT_PUBLIC_ETHEREUM_JSON_RPC;
         const provider = new ethers.JsonRpcProvider(nodeUrl);
-        const privateKey = process.env.NEXT_PUBLIC_ETHEREUM_PRIVATE_KEY;
+        const privateKey = process.env.NEXT_PUBLIC_ETHEREUM_ISSUER_PRIVATE_KEY;// NOTE: this can be any key
         const wallet = new ethers.Wallet(privateKey as string).connect(provider);
         const contract = new ethers.Contract(process.env.NEXT_PUBLIC_ETHEREUM_CONTRACT_ADDRESS as string, contractABI, wallet);
         const data = await contract.getVC(vc.id);

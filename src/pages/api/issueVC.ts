@@ -165,7 +165,7 @@ export default async function handler(
     // Update the following vars in case a new network is launched from scratch:
     // - contractAddress
     // - privateKey, which is used to interact with the contract. It needs to have some balance
-    const privateKey = process.env.NEXT_PUBLIC_ETHEREUM_PRIVATE_KEY;
+    const privateKey = process.env.NEXT_PUBLIC_ETHEREUM_ISSUER_PRIVATE_KEY;
 
     const provider = new ethers.JsonRpcProvider(nodeUrl);
     const wallet = new ethers.Wallet(privateKey as string).connect(provider);
