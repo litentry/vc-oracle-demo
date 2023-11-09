@@ -165,8 +165,8 @@ export default async function handler(
     // Update the following vars in case a new network is launched from scratch:
     // - contractAddress
     // - privateKey, which is used to interact with the contract. It needs to have some balance
-    const contractAddress = '0xD3E32B48F5d463997B402ECEDec4AE958207e9dF';
-    const privateKey = '0xc50f3d80fa49d6d5bbf880b01303767ff53bb47140df786d625e57d2e3a79b76';
+    const contractAddress = '0x3Ef30810DAD4D3AE85048d56bA5D9D2b6E6f4A02';
+    const privateKey = '0xea8e8b7bcf1ffeffb47fddfaaea5ed629b389c1d22c135625ec84cee94950a74';
 
     const provider = new ethers.JsonRpcProvider(nodeUrl);
     const wallet = new ethers.Wallet(privateKey).connect(provider);
@@ -209,7 +209,9 @@ export default async function handler(
 
     const signatureU8a = pair.sign(JSON.stringify(payload));
     const proofValue = u8aToHex(signatureU8a)
+    await contract.setProperties(["signature"].map(ethers.encodeBytes32String))
     const tx = await contract.setVCProperty(id, ethers.encodeBytes32String("signature"), ethers.toUtf8Bytes(proofValue));
+    await tx.wait();
 
     const vc: VC = {
         ...payload,

@@ -7,7 +7,7 @@ import {signatureVerify} from "@polkadot/util-crypto";
 import Head from "next/head";
 import {ethers} from "ethers";
 
-const contractAddress = '0x37a0eF0ac4A2C7d23D491aC1313c3D508a8D8EBB';
+const contractAddress = '0x3Ef30810DAD4D3AE85048d56bA5D9D2b6E6f4A02';
 const contractABI = [
     {
         "inputs": [
